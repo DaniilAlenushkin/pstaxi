@@ -1,13 +1,25 @@
 from django.db import models
 from utils.models import generate_unique_slug
+from django.urls import reverse
+from django.conf import settings
+from django.utils.text import slugify
+from unidecode import unidecode
 
 
 class Brand(models.Model):
     title = models.CharField(max_length=100, verbose_name='Название')
+    logo = models.ImageField(upload_to='motorpool/brands/', blank=True, null=True)
     slug = models.SlugField(max_length=210, default='', blank=True)
+
+    @property
+    def logo_url(self):
+        return self.logo.url if self.logo else f'{settings.STATIC_URL}images/brand-car.png'
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('motorpool:brand_detail', args=[str(self.pk)])
 
     def save(self, *args, **kwargs):
         self.slug = generate_unique_slug(Brand, self.title)
@@ -29,6 +41,17 @@ class Option(models.Model):
         verbose_name = 'Опция'
 
 
+def get_upload_to_auto(instance, filename):
+    full_file_name = 'motorpool/auto'
+    if instance.brand:
+        if instance.brand.slug:
+            full_file_name += f'/{instance.brand.slug}'
+        else:
+            full_file_name += f'/{slugify(unidecode(instance.brand.title), allow_unicode=True)}'
+        full_file_name += f'/{filename}'
+    return full_file_name
+
+
 class Auto(models.Model):
     AUTO_CLASS_ECONOMY = 'e'
     AUTO_CLASS_COMFORT = 'c'
@@ -40,6 +63,7 @@ class Auto(models.Model):
         (AUTO_CLASS_BUSINESS, 'business'),
     ]
 
+    logo = models.ImageField(upload_to=get_upload_to_auto, blank=True, null=True)
     brand = models.ForeignKey(Brand, null=True, on_delete=models.CASCADE, related_name='cars', verbose_name='Бренд')
     options = models.ManyToManyField(Option, related_name='cars', verbose_name='Опции')
     number = models.CharField(max_length=15, verbose_name='Номер')

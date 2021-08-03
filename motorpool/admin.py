@@ -47,7 +47,7 @@ class AutoAdmin(admin.ModelAdmin):
     list_display_links = ['id', 'number', 'brand', ]
     list_filter = [EnginePowerFilter, 'auto_class', 'options', ]
     search_fields = ['brand__title', 'number', ]
-    fields = ['brand', 'number', 'options', ('year', 'auto_class'), ]
+    fields = ['brand', 'number', 'options', ('year', 'auto_class'), 'logo', ]
     readonly_fields = ['id', ]
 
 
