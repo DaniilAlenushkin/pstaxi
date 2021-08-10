@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.utils.text import slugify
 from unidecode import unidecode
+from django.contrib.auth.models import User
 
 
 class Brand(models.Model):
@@ -92,3 +93,11 @@ class VehiclePassport(models.Model):
     class Meta:
         verbose_name_plural = 'Паспорта машин'
         verbose_name = 'Пастпорт машины'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='favorites')
+    brand = models.ForeignKey(Brand, null=True, on_delete=models.CASCADE, related_name='favorites')
+
+    def __str__(self):
+        return f'{self.user.username} - {self.brand.title}'
