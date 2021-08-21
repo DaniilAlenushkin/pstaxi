@@ -143,7 +143,6 @@ class BrandAddToFavoriteForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-
         if Favorite.objects.filter(user=cleaned_data['user'], brand=cleaned_data['brand']).exists():
             raise forms.ValidationError(f'Бренд уже добавлен в избранное')
 

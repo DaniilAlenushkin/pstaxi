@@ -6,19 +6,21 @@ from django.urls import reverse_lazy
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from motorpool.forms import SendEmailForm, BrandCreationForm, BrandUpdateForm, AutoFormSet, BrandAddToFavoriteForm
 from django.views.generic.edit import ProcessFormView
+from django.views.decorators.http import require_POST
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class LoginRequiredMixin:
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseForbidden(reverse_lazy('admin:login'))
-        return super().get(request, *args, **kwargs)
 
 
 class BrandListView(ListView):
     model = Brand
     template_name = 'motorpool/brand_list.html'
-    paginate_by = 15
+
+    def get_paginate_by(self, queryset):
+        paginate_by = super().get_paginate_by(queryset)
+        if 'brand_list_paginate_by' in self.request.session:
+            paginate_by = self.request.session['brand_list_paginate_by']
+        return paginate_by
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -156,3 +158,9 @@ class BrandAddToFavoriteView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         messages.success(self.request, f'Бренд {form.cleaned_data["brand"]} добавлен в избранное')
         return super().form_valid(form)
+
+
+@require_POST
+def set_paginate_view(request):
+    request.session['brand_list_paginate_by'] = request.POST.get('item_count', 0)
+    return HttpResponseRedirect(reverse_lazy('motorpool:brand_list'))
