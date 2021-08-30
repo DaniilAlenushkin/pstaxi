@@ -2,13 +2,13 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-auto pt-3">
-            <a href="#" class="btn btn-dark">PS-Taxi</a>
+            <a href="{% url 'main:index' %}" class="btn btn-dark">PS-Taxi</a>
         </div>
         <div class="main-menu-content col-auto">
             <ul>
-                <li><a href="#" class="text-decoration-none">Домой</a></li>
+                <li><a href="{% url 'main:index' %}" class="text-decoration-none">Домой</a></li>
                 <li><a href="{% url 'motorpool:brand_list' %}" class="text-decoration-none">Бренды</a></li>
-                <li><a href="#" class="text-decoration-none">Автомобили</a></li>
+                <li><a href="{% url 'motorpool:auto_list' %}" class="text-decoration-none">Автомобили</a></li>
             </ul>
         </div>
         <div class="col-auto pt-3">
@@ -22,3 +22,4 @@
     </div>
 </div>
 <!-- END HEADER -->
+
